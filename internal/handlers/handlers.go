@@ -90,13 +90,6 @@ func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
-	// reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
-	// if !ok {
-	// 	m.App.Session.Put(r.Context(), "error", "can't parse form!")
-	// 	http.Redirect(w, r, "/", http.StatusSeeOther)
-	// 	return
-	// }
-
 	err := r.ParseForm()
 	if err != nil {
 		m.App.Session.Put(r.Context(), "error", "can't parse form!")
@@ -127,11 +120,6 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-
-	// reservation.FirstName = r.Form.Get("first_name")
-	// reservation.LastName = r.Form.Get("last_name")
-	// reservation.Phone = r.Form.Get("phone")
-	// reservation.Email = r.Form.Get("email")
 
 	reservation := models.Reservation{
 		FirstName: r.Form.Get("first_name"),
@@ -165,8 +153,6 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-
-	// m.App.Session.Put(r.Context(), "reservation", reservation)
 
 	restriction := models.RoomRestriction{
 		StartDate:     reservation.StartDate,
@@ -344,7 +330,12 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	roomName := m.App.Session.Get(r.Context(), "roomName").(string)
+
 	m.App.Session.Remove(r.Context(), "reservation")
+	m.App.Session.Remove(r.Context(), "roomName")
+
+	reservation.Room.RoomName = roomName
 
 	data := make(map[string]interface{})
 	data["reservation"] = reservation
@@ -376,7 +367,17 @@ func (m *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
 
 	res.RoomID = roomID
 
+	room, err := m.DB.GetRoomByID(roomID)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	res.Room.RoomName = room.RoomName
+
 	m.App.Session.Put(r.Context(), "reservation", res)
+
+	m.App.Session.Put(r.Context(), "roomName", res.Room.RoomName)
 
 	http.Redirect(w, r, "/make-reservation", http.StatusSeeOther)
 }

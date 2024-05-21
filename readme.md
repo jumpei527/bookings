@@ -2,6 +2,14 @@
 ## Description
 This is a hotel reservation web application developed for learning purposes. Visitors to the site can search for accommodations by date and make online reservations, while the site owner can manage reservations through a secure backend.
 
+![Home](./static/images/home.png)
+
+![Search-Availability](./static/images/search.png)
+
+![Reservation-Calendar](./static/images/reservation-calendar.png)
+
+![Reservation-Calendar](./static/images/modify-reservation.png)
+
 ## DB Diagram
 ![ER Diagram](./static/images/database.png)
 
